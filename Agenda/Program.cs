@@ -12,11 +12,13 @@ namespace Agenda
 
         public static void Start()
         {
+            Console.Clear();
             Console.WriteLine("PROGRAMA DE CIUDADANOS");
 
             Console.WriteLine("QUE DESEAS HACER");
             Console.WriteLine("1. Preciona (N) para agregar un ciudadano");
             Console.WriteLine("2. Preciona (L) para listar los ciudadanos");
+            Console.WriteLine("3. Preciona (B) para buscar un ciudadano");
 
             string linea = Console.ReadLine();
             if (linea.ToLower().Equals("n"))
@@ -26,6 +28,10 @@ namespace Agenda
             else if (linea.ToLower().Equals("l"))
             {
                 List();
+            }
+            else if (linea.ToLower().Equals("b"))
+            {
+                Search();
             }
             else
             {
@@ -41,7 +47,7 @@ namespace Agenda
                 var ciudadanos = db.GetCollection<Models.CiudadanoModel>("ciudadanos");
                 var ciudadano = new Models.CiudadanoModel();
 
-                Console.WriteLine();
+                Console.Clear();
                 Console.WriteLine("NUEVO CIUDADANO");
                 Console.WriteLine();
 
@@ -73,7 +79,7 @@ namespace Agenda
 
                 Console.WriteLine();
                 Console.WriteLine("CIUDADANO GUARDADO");
-
+                Console.ReadLine();
                 Start();
             }
         }
@@ -85,7 +91,7 @@ namespace Agenda
                 var ciudadanos = db.GetCollection<Models.CiudadanoModel>("ciudadanos");
                 var results = ciudadanos.Find(Query.All(Query.Descending));
 
-                Console.WriteLine();
+                Console.Clear();
                 Console.WriteLine("LISTADO DE CIUDADANOS");
                 Console.WriteLine();
 
@@ -100,6 +106,39 @@ namespace Agenda
                     Console.WriteLine();
                 }
 
+                Console.ReadLine();
+                Start();
+            }
+        }
+
+        public static void Search()
+        {
+            Console.Clear();
+            Console.WriteLine("LISTADO DE CIUDADANOS");
+            Console.WriteLine();
+
+            Console.WriteLine("Digite su Criterio de Busqueda");
+            Console.WriteLine();
+
+            using (var db = new LiteDatabase(@"ciudadanos.db"))
+            {
+                var ciudadanos = db.GetCollection<Models.CiudadanoModel>("ciudadanos");
+                string linea = Console.ReadLine().ToLower();
+
+                var results = ciudadanos.Find(x=> x.Cedula.Contains(linea) || x.Nombre.ToLower().Contains(linea) || x.Apellidos.ToLower().Contains(linea) || x.Telefono.ToLower().Contains(linea));
+
+                foreach (var ciudadano in results)
+                {
+                    Console.WriteLine();
+
+                    Console.WriteLine("ID: " + ciudadano.Id);
+                    Console.WriteLine("Nombre: " + ciudadano.Nombre + " " + ciudadano.Apellidos);
+                    Console.WriteLine("Cedula: " + ciudadano.Cedula);
+                    Console.WriteLine("Telefono: " + ciudadano.Telefono);
+                    Console.WriteLine();
+                }
+
+                Console.ReadLine();
                 Start();
             }
         }
